@@ -2,9 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class LoginPage extends StatefulWidget {
+import 'forgot_pw_page.dart';
 
+class LoginPage extends StatefulWidget {
   final VoidCallback showRegisterPage;
+
   const LoginPage({super.key, required this.showRegisterPage});
 
   @override
@@ -26,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
-  void dispose(){
+  void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -101,6 +103,36 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
 
+                // Forgot Password...
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 25),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return ForgotPasswordPage();
+                              },
+                            ),
+                          );
+                        },
+                        child: Text(
+                          "Forgot Password?",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
                 // Sign-In Button...
                 SizedBox(height: 10),
                 Padding(
@@ -145,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ],
