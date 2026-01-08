@@ -16,16 +16,117 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _ageController = TextEditingController();
 
   Future signUp() async {
-    if(_passwordController.text.trim() != _confirmPasswordController.text.trim()){
-      print("Password Mismatch");
+    if (_passwordController.text.trim() !=
+        _confirmPasswordController.text.trim()) {
+      showCustomDialog("Password and Confirm password should be same!!");
       return;
     }
-    // Create User with)
-    await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: _emailController.text.trim(),
-      password: _passwordController.text.trim(),
+    // if(_emailController.text.trim().isEmpty){
+    //   showDialog(
+    //     context: context,
+    //     builder: (context) {
+    //       return AlertDialog(
+    //         content: Text(
+    //           "Email cannot be empty",
+    //           style: TextStyle(
+    //             color: Colors.white,
+    //             fontWeight: FontWeight.bold,
+    //           ),
+    //         ),
+    //         backgroundColor: Colors.red[600],
+    //       );
+    //     },
+    //   );
+    //   return;
+    // }
+
+    // Creates User with Email and Password
+
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+    } on FirebaseAuthException catch (e) {
+      // Handle specific FirebaseAuth errors
+      if (e.code == 'weak-password') {
+        showCustomDialog('The password provided is too weak!');
+      } else if (e.code == 'email-already-in-use') {
+        showCustomDialog('An account already exists for that email!');
+      } else if (e.code == 'invalid-email') {
+        showCustomDialog('The email address is not valid!');
+      } else {
+        showCustomDialog('Something went wrong: ${e.message}!');
+      }
+    }
+  }
+
+  void showCustomDialog(String message) {
+    // showDialog(
+    //   context: context,
+    //   builder: (context) {
+    //     return AlertDialog(
+    //       content: Text(
+    //         message,
+    //         style: TextStyle(
+    //           color: Colors.white,
+    //           fontWeight: FontWeight.bold,
+    //         ),
+    //       ),
+    //       backgroundColor: Colors.deepPurple[300]
+    //     );
+    //   },
+    // );
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          backgroundColor: Colors.grey[200],
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 25),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.android, size: 40),
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    padding: const EdgeInsets.all(5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    "Close",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -34,6 +135,9 @@ class _RegisterPageState extends State<RegisterPage> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _ageController.dispose();
     super.dispose();
   }
 
@@ -59,8 +163,77 @@ class _RegisterPageState extends State<RegisterPage> {
                   style: TextStyle(fontSize: 20),
                 ),
 
+                // First name TextField...
+                SizedBox(height: 10),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      border: Border.all(color: Colors.white),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 20),
+                      child: TextField(
+                        controller: _firstNameController,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "First Name",
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Last Name TextField...
+                SizedBox(height: 10),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      border: Border.all(color: Colors.white),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 20),
+                      child: TextField(
+                        controller: _lastNameController,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Last Name",
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Age TextField...
+                SizedBox(height: 10),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      border: Border.all(color: Colors.white),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 20),
+                      child: TextField(
+                        controller: _ageController,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Your age",
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
                 // Email TextField...
-                SizedBox(height: 50),
+                SizedBox(height: 10),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 25),
                   child: Container(
