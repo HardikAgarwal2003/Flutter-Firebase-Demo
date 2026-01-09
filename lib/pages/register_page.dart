@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,27 +27,12 @@ class _RegisterPageState extends State<RegisterPage> {
       showCustomDialog("Password and Confirm password should be same!!");
       return;
     }
-    // if(_emailController.text.trim().isEmpty){
-    //   showDialog(
-    //     context: context,
-    //     builder: (context) {
-    //       return AlertDialog(
-    //         content: Text(
-    //           "Email cannot be empty",
-    //           style: TextStyle(
-    //             color: Colors.white,
-    //             fontWeight: FontWeight.bold,
-    //           ),
-    //         ),
-    //         backgroundColor: Colors.red[600],
-    //       );
-    //     },
-    //   );
-    //   return;
-    // }
+    if (_emailController.text.trim().isEmpty) {
+      showCustomDialog("Email cannot be empty");
+      return;
+    }
 
-    // Creates User with Email and Password
-
+    // Creates User with Email and Password...
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -64,25 +50,42 @@ class _RegisterPageState extends State<RegisterPage> {
         showCustomDialog('Something went wrong: ${e.message}!');
       }
     }
+
+    // Save user details in Firestore Database ...
+    try {
+      if (_firstNameController.text.trim().isNotEmpty &&
+          _lastNameController.text.trim().isNotEmpty &&
+          _ageController.text.trim().isNotEmpty &&
+          _emailController.text.trim().isNotEmpty) {
+        saveUserDetails(
+          _firstNameController.text.trim(),
+          _lastNameController.text.trim(),
+          _emailController.text.trim(),
+          int.parse(_ageController.text.trim()),
+        );
+      }else{
+        showCustomDialog("Please fill all the fields");
+      }
+    } on FirebaseException catch (e) {
+      showCustomDialog('Something went wrong: ${e.message}!');
+    }
+  }
+
+  Future saveUserDetails(
+    String firstName,
+    String lastName,
+    String email,
+    int age,
+  ) async {
+    await FirebaseFirestore.instance.collection('users').add({
+      "First Name": firstName,
+      "Last Name": lastName,
+      "Age": age,
+      "email": email,
+    });
   }
 
   void showCustomDialog(String message) {
-    // showDialog(
-    //   context: context,
-    //   builder: (context) {
-    //     return AlertDialog(
-    //       content: Text(
-    //         message,
-    //         style: TextStyle(
-    //           color: Colors.white,
-    //           fontWeight: FontWeight.bold,
-    //         ),
-    //       ),
-    //       backgroundColor: Colors.deepPurple[300]
-    //     );
-    //   },
-    // );
-
     showDialog(
       context: context,
       builder: (context) {
@@ -116,10 +119,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   child: const Text(
                     "Close",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
               ],

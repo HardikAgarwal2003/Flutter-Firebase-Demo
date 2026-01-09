@@ -88,7 +88,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.deepPurple[200], elevation: 0),
+      appBar: AppBar(backgroundColor: Colors.deepPurple, foregroundColor: Colors.white),
+      backgroundColor: Colors.grey[300],
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -121,12 +122,32 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               ),
             ),
           ),
-          SizedBox(height: 10),
-          MaterialButton(
-            onPressed: resetPassword,
-            color: Colors.deepPurple[200],
-            elevation: 8,
-            child: Text("Reset Password"),
+          SizedBox(height: 13),
+
+
+
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 25),
+            child: GestureDetector(
+              onTap: resetPassword,
+              child: Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.deepPurple,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    "Reset Password",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),
