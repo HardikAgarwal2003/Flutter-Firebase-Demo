@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../Utilities/custom_alert_dialog.dart';
+
 class RegisterPage extends StatefulWidget {
   final VoidCallback showLoginPage;
 
@@ -24,11 +26,14 @@ class _RegisterPageState extends State<RegisterPage> {
   Future signUp() async {
     if (_passwordController.text.trim() !=
         _confirmPasswordController.text.trim()) {
-      showCustomDialog("Password and Confirm password should be same!!");
+      CustomAlertDialog.showCustomAlertDialog(
+        context,
+        "Password and Confirm password should be same!!",
+      );
       return;
     }
     if (_emailController.text.trim().isEmpty) {
-      showCustomDialog("Email cannot be empty");
+      CustomAlertDialog.showCustomAlertDialog(context, "Email cannot be empty");
       return;
     }
 
@@ -39,15 +44,31 @@ class _RegisterPageState extends State<RegisterPage> {
         password: _passwordController.text.trim(),
       );
     } on FirebaseAuthException catch (e) {
-      // Handle specific FirebaseAuth errors
+
+      // to fix the context warning, as alert should not show, if user navigated to some other place until await is loading some content.
+      if (!mounted) return;
+
+      // Handling specific FirebaseAuth errors
       if (e.code == 'weak-password') {
-        showCustomDialog('The password provided is too weak!');
+        CustomAlertDialog.showCustomAlertDialog(
+          context,
+          'The password provided is too weak!',
+        );
       } else if (e.code == 'email-already-in-use') {
-        showCustomDialog('An account already exists for that email!');
+        CustomAlertDialog.showCustomAlertDialog(
+          context,
+          'An account already exists for that email!',
+        );
       } else if (e.code == 'invalid-email') {
-        showCustomDialog('The email address is not valid!');
+        CustomAlertDialog.showCustomAlertDialog(
+          context,
+          'The email address is not valid!',
+        );
       } else {
-        showCustomDialog('Something went wrong: ${e.message}!');
+        CustomAlertDialog.showCustomAlertDialog(
+          context,
+          'Something went wrong: ${e.message}!',
+        );
       }
     }
 
@@ -63,11 +84,19 @@ class _RegisterPageState extends State<RegisterPage> {
           _emailController.text.trim(),
           int.parse(_ageController.text.trim()),
         );
-      }else{
-        showCustomDialog("Please fill all the fields");
+      } else {
+        if (!mounted) return;
+        CustomAlertDialog.showCustomAlertDialog(
+          context,
+          "Please fill all the fields",
+        );
       }
     } on FirebaseException catch (e) {
-      showCustomDialog('Something went wrong: ${e.message}!');
+      if (!mounted) return;
+      CustomAlertDialog.showCustomAlertDialog(
+        context,
+        'Something went wrong: ${e.message}!',
+      );
     }
   }
 
@@ -83,51 +112,6 @@ class _RegisterPageState extends State<RegisterPage> {
       "Age": age,
       "email": email,
     });
-  }
-
-  void showCustomDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          backgroundColor: Colors.grey[200],
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 25),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.android, size: 40),
-                Text(
-                  message,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    padding: const EdgeInsets.all(5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    "Close",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
   }
 
   @override
@@ -151,22 +135,22 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.android, size: 40),
+                const Icon(Icons.android, size: 40),
                 // Hello There!...
                 Text(
                   "Hello There!",
                   style: GoogleFonts.bebasNeue(fontSize: 52),
                 ),
                 SizedBox(height: 20),
-                Text(
+                const Text(
                   "Register below with your details!",
                   style: TextStyle(fontSize: 20),
                 ),
 
                 // First name TextField...
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
@@ -187,9 +171,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
 
                 // Last Name TextField...
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
@@ -210,9 +194,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
 
                 // Age TextField...
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
@@ -220,7 +204,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.only(left: 20),
+                      padding: const EdgeInsets.only(left: 20),
                       child: TextField(
                         controller: _ageController,
                         decoration: InputDecoration(
@@ -233,7 +217,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
 
                 // Email TextField...
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 25),
                   child: Container(
@@ -243,7 +227,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.only(left: 20),
+                      padding: const EdgeInsets.only(left: 20),
                       child: TextField(
                         controller: _emailController,
                         decoration: InputDecoration(
@@ -256,9 +240,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
 
                 // Password TextField...
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
@@ -266,7 +250,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.only(left: 20),
+                      padding: const EdgeInsets.only(left: 20),
                       child: TextField(
                         obscureText: true,
                         controller: _passwordController,
@@ -282,7 +266,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 // Confirm Password TextField...
                 SizedBox(height: 10),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
@@ -290,11 +274,11 @@ class _RegisterPageState extends State<RegisterPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.only(left: 20),
+                      padding: const EdgeInsets.only(left: 20),
                       child: TextField(
                         obscureText: true,
                         controller: _confirmPasswordController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           hintText: "Confirm Password",
                         ),
@@ -304,19 +288,19 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
 
                 // Sign-In Button...
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: GestureDetector(
                     onTap: signUp,
                     child: Container(
-                      padding: EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.deepPurple,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Center(
-                        child: Text(
+                        child: const Text(
                           "Sign Up",
                           style: TextStyle(
                             color: Colors.white,
@@ -330,17 +314,17 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
 
                 // not a member? Register now...
-                SizedBox(height: 25),
+                const SizedBox(height: 25),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       "Already a member?",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     GestureDetector(
                       onTap: widget.showLoginPage,
-                      child: Text(
+                      child: const Text(
                         " Sign-in now",
                         style: TextStyle(
                           color: Colors.blue,
