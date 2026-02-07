@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/Utilities/custom_alert_dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../helper/my_helper_functions.dart';
 import 'forgot_pw_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -21,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  Future signIn() async {
+  Future<void> signIn() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       CustomAlertDialog.showCustomAlertDialog(
         context,
@@ -29,31 +30,65 @@ class _LoginPageState extends State<LoginPage> {
       );
       return;
     }
+
+    // Email validation (important)
+    if (!isValidEmail(_emailController.text.trim())) {
+      CustomAlertDialog.showCustomAlertDialog(
+        context,
+        'Please enter a valid email address.',
+      );
+      return;
+    }
+
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
     } on FirebaseAuthException catch (e) {
-      // Handle specific FirebaseAuth errors
       if (!mounted) return;
-      if (e.code == 'invalid-email') {
-        CustomAlertDialog.showCustomAlertDialog(
-          context,
-          'The email address is not valid!',
-        );
-      } else if (e.code == 'user-not-found' ||
-          e.code == 'wrong-password' ||
-          e.code == 'invalid-credential') {
-        CustomAlertDialog.showCustomAlertDialog(
-          context,
-          'Invalid email or password!',
-        );
-      } else {
-        CustomAlertDialog.showCustomAlertDialog(
-          context,
-          'Something went wrong: ${e.message}!',
-        );
+
+      switch (e.code) {
+        case 'invalid-email':
+          CustomAlertDialog.showCustomAlertDialog(
+            context,
+            'The email address is not valid!',
+          );
+          break;
+
+        case 'user-not-found':
+          CustomAlertDialog.showCustomAlertDialog(
+            context,
+            'No user found for this email.',
+          );
+          break;
+
+        case 'wrong-password':
+          CustomAlertDialog.showCustomAlertDialog(
+            context,
+            'Incorrect password.',
+          );
+          break;
+
+        case 'invalid-credential':
+          CustomAlertDialog.showCustomAlertDialog(
+            context,
+            'Invalid email or password.',
+          );
+          break;
+
+        case 'too-many-requests':
+          CustomAlertDialog.showCustomAlertDialog(
+            context,
+            'Too many login attempts. Please try again later.',
+          );
+          break;
+
+        default:
+          CustomAlertDialog.showCustomAlertDialog(
+            context,
+            e.message ?? 'Something went wrong!',
+          );
       }
     }
   }
